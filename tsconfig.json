@@ -15,6 +15,8 @@
     "useDefineForClassFields": true,
     "baseUrl": "./",
     "outDir": "bundles/",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@viewfly/core",
     "paths": {
       "@tanbo/matrix": [
         "src/public-api.ts"
@@ -25,7 +27,7 @@
     },
   },
   "include": [
-    "index.ts",
+    "index.tsx",
     "src/",
     "test/"
   ]
