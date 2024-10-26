@@ -1,46 +1,43 @@
-import { Matrix } from '@tanbo/matrix'
-
-export interface Point {
-  x: number
-  y: number
-}
+import { Matrix } from './matrix'
 
 export class Transform {
-  matrix = new Matrix(1, 0, 0, 1, 0, 0)
-
-  constructor(public x1: number,
-              public y1: number,
-              public x2: number,
-              public y2: number) {
+  constructor(public matrix = new Matrix()) {
   }
 
-  getCoordinate(index: 1 | 2 | 3 | 4): Point {
-    const {x1, y1, x2, y2} = this
-    if (index === 1) {
-      return {
-        x: this.matrix.scaleX * x1 + this.matrix.skewX * y1 + this.matrix.translateX,
-        y: this.matrix.skewY * x1 + this.matrix.scaleY * y1 + this.matrix.translateY
-      }
-    }
-    if (index === 2) {
-      return {
-        x: this.matrix.scaleX * x2 + this.matrix.skewX * y1 + this.matrix.translateX,
-        y: this.matrix.skewY * x2 + this.matrix.scaleY * y1 + this.matrix.translateY,
-      }
-    }
-    if (index === 3) {
-      return {
-        x: this.matrix.scaleX * x2 + this.matrix.skewX * y2 + this.matrix.translateX,
-        y: this.matrix.skewY * x2 + this.matrix.scaleY * y2 + this.matrix.translateY
-      }
-    }
-    if (index === 4) {
-      return {
-        x: this.matrix.scaleX * x1 + this.matrix.skewX * y2 + this.matrix.translateX,
-        y: this.matrix.skewY * x1 + this.matrix.scaleY * y2 + this.matrix.translateY,
-      }
-    }
-    throw new Error('')
+  rotate(deg: number): Transform {
+    const angle = deg * Math.PI / 180
+    const matrix = new Matrix(Math.cos(angle), Math.sin(angle), -Math.sin(angle), Math.cos(angle), 0, 0)
+    return new Transform(this.matrix.multiply(matrix))
   }
 
+  translate(x: number, y: number): Transform {
+    return new Transform(this.matrix.multiply(new Matrix(1, 0, 0, 1, x, y)))
+  }
+
+  translateX(n: number) {
+    return this.translate(n, 0)
+  }
+
+  translateY(n: number) {
+    return this.translate(0, n)
+  }
+
+  skew(degX: number, degY: number) {
+    const angleX = degX * Math.PI / 180
+    const angleY = degY * Math.PI / 180
+    return new Transform(this.matrix.multiply(new Matrix(1, Math.tan(angleY), Math.tan(angleX), 1, 0, 0)))
+  }
+
+  skewX(n: number) {
+    return this.skew(n, 0)
+  }
+
+  skewY(n: number) {
+    return this.skew(0, n)
+  }
+
+  toCSSString() {
+    const matrix = this.matrix
+    return `matrix(${matrix.scaleX}, ${matrix.skewY}, ${matrix.skewX}, ${matrix.scaleY}, ${matrix.translateX}, ${matrix.translateY})`
+  }
 }

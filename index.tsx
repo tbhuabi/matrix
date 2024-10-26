@@ -3,7 +3,7 @@ import { createApp } from '@viewfly/platform-browser'
 
 
 function App() {
-  const transform = new Transform(1, 1, 3, 3)
+  const transform = new Transform()
 
   return () => {
     return (
@@ -32,11 +32,12 @@ function App() {
             border: '1px solid #000',
             boxSizing: 'border-box',
             // transform: 'matrix(1, 0, 0, 1, 0, 0)'
-            transform: transform.matrix.rotate(45).multiply(new Matrix(1, 0, 0, 1, 20, 20)).toCSSString()
+            transform: transform.skew(0, 45).toCSSString()
           }}>
           </div>
         </div>
         <div style={{
+          // display: 'none',
           position: 'absolute',
           left: 0,
           top: 0,
@@ -44,7 +45,7 @@ function App() {
           width: '100px',
           height: '100px',
           background: 'green',
-          transform: 'matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)',
+          // transform: 'matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)',
         }}>
           <div style={{
             width: '50px',
@@ -54,7 +55,7 @@ function App() {
             top: '25px',
             border: '1px solid #000',
             boxSizing: 'border-box',
-            transform: 'matrix(1, 0, 0, 1, 20, 20)'
+            transform: 'matrix(1, 1, 0, 1, 0, 0)'
           }}>
           </div>
         </div>

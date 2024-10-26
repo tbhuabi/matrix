@@ -10,19 +10,18 @@ export type MatrixSimpleArray = [
   number, number, number,
 ]
 
-export class Matrix {
-  constructor(public scaleX: number,
-              public skewY: number,
-              public skewX: number,
-              public scaleY: number,
-              public translateX: number,
-              public translateY: number,) {
-  }
+export interface Point {
+  x: number
+  y: number
+}
 
-  rotate(deg: number): Matrix {
-    const angle = deg * Math.PI / 180
-    const matrix = new Matrix(Math.cos(angle), Math.sin(angle), -Math.sin(angle), Math.cos(angle), 0, 0)
-    return this.multiply(matrix)
+export class Matrix {
+  constructor(public scaleX = 1,
+              public skewY = 0,
+              public skewX = 0,
+              public scaleY = 1,
+              public translateX = 0,
+              public translateY = 0) {
   }
 
   plus(matrix: Matrix): Matrix {
@@ -67,6 +66,13 @@ export class Matrix {
     return new Matrix(scaleX, skewY, skewX, scaleY, translateX, translateY)
   }
 
+  getCoordinate(x: number, y: number): Point {
+    return {
+      x: this.scaleX * x + this.skewX * y + this.translateX,
+      y: this.skewY * x + this.scaleY * y + this.translateY
+    }
+  }
+
   toArray(): MatrixSimpleArray {
     return [
       this.scaleX, this.skewX, this.translateX,
@@ -81,9 +87,5 @@ export class Matrix {
       [this.skewY, this.scaleY, this.translateY],
       [0, 0, 1]
     ]
-  }
-
-  toCSSString() {
-    return `matrix(${this.scaleX}, ${this.skewY}, ${this.skewX}, ${this.scaleY}, ${this.translateX}, ${this.translateY})`
   }
 }
