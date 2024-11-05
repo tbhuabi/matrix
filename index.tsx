@@ -1,64 +1,107 @@
-import { Matrix, Transform } from '@tanbo/matrix'
+import { Coordinate, Matrix, Transform } from '@tanbo/matrix'
 import { createApp } from '@viewfly/platform-browser'
+import { createRef, createSignal, onMounted } from '@viewfly/core'
+import { fromEvent } from '@tanbo/stream'
 
+import './index.scss'
 
 function App() {
-  const transform = new Transform()
+
+  const containerRef = createRef<HTMLElement>()
+  const targetRef = createRef<HTMLElement>()
+  const start = new Transform()// .skewX(45).skewY(10)
+  const transform = createSignal(start)
+  const styles = {
+    left: 50,
+    top: 50,
+    width: 100,
+    height: 100,
+  }
+
+  function getTranslate(x: number, y: number) {
+    const point = transform().matrix.getCoordinate(x, y)
+    return `${point.x}px, ${point.y}px`
+  }
+
+  const deg = createSignal(0)
+
+  const boxRef = createRef<HTMLElement>()
+
+  onMounted(() => {
+    const el = targetRef.current!
+
+    fromEvent<MouseEvent>(el, 'mousedown').subscribe(ev => {
+      const centerPoint = {
+        x: styles.left + styles.width / 2,
+        y: styles.top + styles.height / 2,
+      }
+      const point = transform().matrix.getCoordinate(-styles.width / 2, styles.height / 2)
+      const startCoordinate = new Coordinate(centerPoint.x, centerPoint.y)
+
+      const defaultDeg = startCoordinate.getDeg(point.x + centerPoint.x, point.y + centerPoint.y)
+      const rect = boxRef.current!.getBoundingClientRect()
+      const startDeg = startCoordinate.getDeg(ev.x - rect.x, ev.y - rect.y)
+
+      // deg.set(startCoordinate.getDeg(ev.x - rect.x, ev.y - rect.y))
+      const moveEvent = fromEvent<MouseEvent>(document, 'mousemove').subscribe(ev => {
+        const endDeg = startCoordinate.getDeg(ev.x - rect.x, ev.y - rect.y)
+
+        const result = endDeg - startDeg + defaultDeg - 135
+        deg.set(result)
+        transform.set(start.rotate(result))
+      })
+
+      const upEvent = fromEvent<MouseEvent>(document, 'mouseup').subscribe(() => {
+        moveEvent.unsubscribe()
+        upEvent.unsubscribe()
+      })
+    })
+  })
 
   return () => {
     return (
-      <div style={{
-        width: '200px',
-        height: '200px',
-        position: 'relative',
-        margin: '0 auto',
-      }}>
-        <div style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          opacity: 0.5,
-          width: '100px',
-          height: '100px',
-          background: 'red',
-          // transform: 'matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)',
+      <div class="container" ref={boxRef}>
+        <div class="box" style={{
+          background: 'green'
         }}>
-          <div style={{
-            width: '50px',
-            height: '50px',
-            position: 'absolute',
-            left: '25px',
-            top: '25px',
-            border: '1px solid #000',
-            boxSizing: 'border-box',
-            // transform: 'matrix(1, 0, 0, 1, 0, 0)'
-            transform: transform.skew(0, 45).toCSSString()
+          <div ref={containerRef} class="obj" style={{
+            left: styles.left + 'px',
+            top: styles.top + 'px',
+            width: styles.width + 'px',
+            height: styles.height + 'px',
+            transform: transform().toCSSString(),
           }}>
           </div>
         </div>
-        <div style={{
-          // display: 'none',
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          opacity: 0.5,
-          width: '100px',
-          height: '100px',
-          background: 'green',
-          // transform: 'matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)',
+        <div class="handlers" style={{
+          left: styles.left + 'px',
+          top: styles.top + 'px',
+          width: styles.width + 'px',
+          height: styles.height + 'px',
         }}>
           <div style={{
-            width: '50px',
-            height: '50px',
-            position: 'absolute',
-            left: '25px',
-            top: '25px',
-            border: '1px solid #000',
-            boxSizing: 'border-box',
-            transform: 'matrix(1, 1, 0, 1, 0, 0)'
-          }}>
+            transform: `translate(${getTranslate(-styles.width / 2, -styles.height / 2)})`
+          }}>1
           </div>
+          <div style={{
+            transform: `translate(${getTranslate(styles.width / 2, -styles.height / 2)})`
+          }}>2
+          </div>
+          <div style={{
+            transform: `translate(${getTranslate(styles.width / 2, styles.height / 2)})`
+          }}>3
+          </div>
+          <div style={{
+            transform: `translate(${getTranslate(-styles.width / 2, styles.height / 2)})`
+          }}>4
+          </div>
+          <button style={{
+            transform: `translate(${getTranslate(-(styles.width + 100) / 2, (styles.height + 100) / 2)})`
+          }} ref={targetRef}>旋转
+          </button>
         </div>
+        <div>{deg()}</div>
+
       </div>
     )
   }

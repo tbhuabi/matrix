@@ -1,0 +1,55 @@
+.container {
+    width: 200px;
+    margin: 50px auto;
+    position: relative;
+}
+
+
+.box {
+    width: 200px;
+    height: 200px;
+    background: cadetblue;
+    position: absolute;
+    opacity: .5;
+}
+
+.obj {
+    width: 100px;
+    height: 100px;
+    left: 50px;
+    top: 50px;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    position: absolute;
+
+    > div {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: black;
+    }
+}
+
+.handlers {
+    position: absolute;
+    div {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #1777dc;
+        left: 50%;
+        top: 50%;
+        margin-left: -5px;
+        margin-top: -5px;
+    }
+
+    button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 30px;
+        height: 20px;
+        margin-left: -15px;
+        margin-top: -10px;
+    }
+}

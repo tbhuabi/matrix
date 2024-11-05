@@ -20,7 +20,7 @@ module.exports = {
     }
   },
   devServer: {
-    host: '127.0.0.1',
+    host: ip.address(),
     static: path.join(__dirname, 'dist'),
     compress: true,
     port: 9027,
@@ -37,6 +37,23 @@ module.exports = {
       //     loader: 'eslint-loader'
       //   }]
       // },
+      {
+        test: /\.s?css$/,
+        use: [
+          'style-loader',
+          {
+            // loader: 'css-loader',
+            loader: '@viewfly/devtools/scoped-css-webpack-loader',
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: '[local]__[hash:base64:5]',
+              },
+            },
+          },
+          'sass-loader',
+        ],
+      },
       {
         test: /\.tsx?$/,
         use: ['ts-loader'],
