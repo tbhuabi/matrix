@@ -7,15 +7,8 @@ export class Coordinate {
     const width = x - this.x
     const height = y - this.y
 
-    const deg = 180 / Math.PI * Math.atan(height / width)
-
-    if (width < 0) {
-      return 180 + deg
-    }
-    if (height < 0) {
-      return 360 + deg
-    }
-    return deg
+    const deg = 180 / Math.PI * Math.atan2(height, width)
+    return (deg + 360) % 360
   }
 
   getHypotenuse(x: number, y: number) {

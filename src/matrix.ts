@@ -30,7 +30,7 @@ export class Matrix {
       return item + addend[index]
     })
 
-    return new Matrix(a, b, c, d, e, f)
+    return this.update(a, b, c, d, e, f)
   }
 
   minus(matrix: Matrix): Matrix {
@@ -39,13 +39,59 @@ export class Matrix {
       return item - minuend[index]
     })
 
-    return new Matrix(a, b, c, d, e, f)
+    return this.update(a, b, c, d, e, f)
   }
 
-  // divide(matrix: Matrix): Matrix {
-  //
-  // }
+  divide(matrix: Matrix): Matrix {
+    const divisor = matrix.toMatrixArray()
+    const dividend = this.toMatrixArray()
 
+    // Calculate the inverse of the divisor matrix
+    const det = divisor[0][0] * (divisor[1][1] * divisor[2][2] - divisor[1][2] * divisor[2][1]) -
+      divisor[0][1] * (divisor[1][0] * divisor[2][2] - divisor[1][2] * divisor[2][0]) +
+      divisor[0][2] * (divisor[1][0] * divisor[2][1] - divisor[1][1] * divisor[2][0])
+
+    if (det === 0) {
+      throw new Error('Matrix division by a matrix with determinant 0 is undefined.')
+    }
+
+    const invDet = 1 / det
+
+    const inverse = [
+      [
+        invDet * (divisor[1][1] * divisor[2][2] - divisor[1][2] * divisor[2][1]),
+        invDet * (divisor[0][2] * divisor[2][1] - divisor[0][1] * divisor[2][2]),
+        invDet * (divisor[0][1] * divisor[1][2] - divisor[0][2] * divisor[1][1])
+      ],
+      [
+        invDet * (divisor[1][2] * divisor[2][0] - divisor[1][0] * divisor[2][2]),
+        invDet * (divisor[0][0] * divisor[2][2] - divisor[0][2] * divisor[2][0]),
+        invDet * (divisor[0][2] * divisor[1][0] - divisor[0][0] * divisor[1][2])
+      ],
+      [
+        invDet * (divisor[1][0] * divisor[2][1] - divisor[1][1] * divisor[2][0]),
+        invDet * (divisor[0][1] * divisor[2][0] - divisor[0][0] * divisor[2][1]),
+        invDet * (divisor[0][0] * divisor[1][1] - divisor[0][1] * divisor[1][0])
+      ]
+    ]
+
+    // Perform matrix multiplication: dividend * inverse
+    const result = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ]
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        for (let k = 0; k < 3; k++) {
+          result[i][j] += dividend[i][k] * inverse[k][j]
+        }
+      }
+    }
+
+    const [scaleX, skewX, translateX, skewY, scaleY, translateY] = result.flat()
+    return this.update(scaleX, skewY, skewX, scaleY, translateX, translateY)
+  }
 
   multiply(matrix: Matrix): Matrix {
     const m1 = this.toMatrixArray()
@@ -63,7 +109,7 @@ export class Matrix {
       }
     }
     const [scaleX, skewX, translateX, skewY, scaleY, translateY] = result.flat()
-    return new Matrix(scaleX, skewY, skewX, scaleY, translateX, translateY)
+    return this.update(scaleX, skewY, skewX, scaleY, translateX, translateY)
   }
 
   getCoordinate(x: number, y: number): Point {
@@ -87,5 +133,21 @@ export class Matrix {
       [this.skewY, this.scaleY, this.translateY],
       [0, 0, 1]
     ]
+  }
+
+  private update(scaleX: number,
+                 skewY: number,
+                 skewX: number,
+                 scaleY: number,
+                 translateX: number,
+                 translateY: number) {
+    this.scaleX = scaleX
+    this.skewY = skewY
+    this.skewX = skewX
+    this.scaleX = scaleX
+    this.scaleY = scaleY
+    this.translateX = translateX
+    this.translateY = translateY
+    return this
   }
 }

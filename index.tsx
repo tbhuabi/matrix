@@ -9,7 +9,7 @@ function App() {
 
   const containerRef = createRef<HTMLElement>()
   const targetRef = createRef<HTMLElement>()
-  const start = new Transform()// .skewX(45).skewY(10)
+  const start = new Transform()
   const transform = createSignal(start)
   const styles = {
     left: 50,

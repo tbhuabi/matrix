@@ -15,6 +15,28 @@ export class Rectangle {
     this.centerY = this.y + height / 2
   }
 
+  getRect() {
+    const points: Point[] = [
+      this.getCoordinate(0),
+      this.getCoordinate(2),
+      this.getCoordinate(4),
+      this.getCoordinate(6),
+    ]
+
+    const x = Math.min(...points.map(i => i.x))
+    const y = Math.min(...points.map(i => i.y))
+    const maxX = Math.max(...points.map(i => i.x))
+    const maxY = Math.max(...points.map(i => i.y))
+    return {
+      x,
+      y,
+      right: maxX,
+      bottom: maxY,
+      width: maxX - x,
+      height: maxY - y,
+    }
+  }
+
   getCoordinate(pointIndex: number): Point {
     pointIndex %= 8
     let point: Point
@@ -51,37 +73,52 @@ export class Rectangle {
   }
 
   rotate(deg: number) {
-    this.transform = this.transform.rotate(deg)
+    this.transform.rotate(deg)
     return this
   }
 
   translate(x: number, y: number) {
-    this.transform = this.transform.translate(x, y)
+    this.transform.translate(x, y)
     return this
   }
 
   translateX(n: number) {
-    this.transform = this.transform.translateX(n)
+    this.transform.translateX(n)
     return this
   }
 
   translateY(n: number) {
-    this.transform = this.transform.translateY(n)
+    this.transform.translateY(n)
     return this
   }
 
   skew(degX: number, degY: number) {
-    this.transform = this.transform.skew(degX, degY)
+    this.transform.skew(degX, degY)
     return this
   }
 
   skewX(n: number) {
-    this.transform = this.transform.skewX(n)
+    this.transform.skewX(n)
     return this
   }
 
   skewY(n: number) {
-    this.transform = this.transform.skewY(n)
+    this.transform.skewY(n)
+    return this
+  }
+
+  scaleX(n: number) {
+    this.transform.scaleX(n)
+    return this
+  }
+
+  scaleY(n: number) {
+    this.transform.scaleY(n)
+    return this
+  }
+
+  scale(n: number) {
+    this.transform.scale(n)
     return this
   }
 
